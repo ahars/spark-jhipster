@@ -50,6 +50,8 @@
                                 </span>
                             </a>
                             <ul class="dropdown-menu" ng-controller="MenuController">
+                                <li ng-switch-when="true"><a href="#/author"><span class="glyphicon glyphicon-asterisk"></span>&nbsp;author</a></li>
+                                <li ng-switch-when="true"><a href="#/book"><span class="glyphicon glyphicon-asterisk"></span>&nbsp;book</a></li>
                                 <!-- JHipster will add entities to the menu here -->
                             </ul>
                         </li>
@@ -171,6 +173,12 @@
         <script src="bower_components/bootstrap-sass/vendor/assets/javascripts/bootstrap/scrollspy.js"></script>
         <script src="bower_components/bootstrap-sass/vendor/assets/javascripts/bootstrap/collapse.js"></script>
         <script src="bower_components/bootstrap-sass/vendor/assets/javascripts/bootstrap/tab.js"></script>
+        <script src="scripts/author/router_author.js"></script>
+        <script src="scripts/author/controller_author.js"></script>
+        <script src="scripts/author/service_author.js"></script>
+        <script src="scripts/book/router_book.js"></script>
+        <script src="scripts/book/controller_book.js"></script>
+        <script src="scripts/book/service_book.js"></script>
         <!-- endbuild -->
 </body>
 </html>
