@@ -79,6 +79,9 @@ public class MetricsConfiguration extends MetricsConfigurerAdapter implements En
             final JmxReporter jmxReporter = JmxReporter.forRegistry(METRIC_REGISTRY).build();
             jmxReporter.start();
         }
+        final MetricRegistry registry = new MetricRegistry();
+        SparkReporter reporter = SparkReporter.forRegistry(registry).build();
+        reporter.start(5, TimeUnit.SECONDS);
     }
 
     @Configuration

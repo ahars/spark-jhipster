@@ -1,2 +1,5 @@
-README for jhipster_sandbox
+jhipster_sandbox
 ==========================
+
+# Jhipster Sandbox
+
