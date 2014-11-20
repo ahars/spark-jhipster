@@ -1,4 +1,2 @@
-sparkhipster
-============
-
-jhipster sandbox
+README for jhipster_sandbox
+==========================
