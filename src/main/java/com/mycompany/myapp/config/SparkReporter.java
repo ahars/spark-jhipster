@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.net.Socket;
 import java.util.Map;
@@ -91,9 +92,9 @@ public class SparkReporter extends ScheduledReporter {
 
         try {
             socket = new Socket(host, port);
-            LOGGER.info("connection socket : ", socket.toString());
+            LOGGER.info("Socket connection ", socket.toString());
         } catch (IOException e) {
-            LOGGER.error("Fail connection socket : ", e);
+            LOGGER.error("Failed connection socket ", e);
         }
     }
 
@@ -106,7 +107,7 @@ public class SparkReporter extends ScheduledReporter {
 
         // nothing to do if we don't have any metrics to report
         if (gauges.isEmpty() && counters.isEmpty() && histograms.isEmpty() && meters.isEmpty() && timers.isEmpty()) {
-            LOGGER.info("Waiting for metrics...");
+            LOGGER.info("Waiting for metrics..");
             return;
         }
 
@@ -116,35 +117,35 @@ public class SparkReporter extends ScheduledReporter {
             if (!gauges.isEmpty()) {
                 for (Map.Entry<String, Gauge> entry : gauges.entrySet()) {
                     reportGauge(entry.getKey(), entry.getValue(), timestamp);
-                    LOGGER.info("Writing gauge...");
+                    LOGGER.info("Writing gauge.");
                 }
             }
             if (!counters.isEmpty()) {
                 for (Map.Entry<String, Counter> entry : counters.entrySet()) {
                     reportCounter(entry.getKey(), entry.getValue(), timestamp);
-                    LOGGER.info("Writing counter...");
+                    LOGGER.info("Writing counter.");
                 }
             }
             if (!histograms.isEmpty()) {
                 for (Map.Entry<String, Histogram> entry : histograms.entrySet()) {
                     reportHistogram(entry.getKey(), entry.getValue(), timestamp);
-                    LOGGER.info("Writing histogram...");
+                    LOGGER.info("Writing histogram.");
                 }
             }
             if (!meters.isEmpty()) {
                 for (Map.Entry<String, Meter> entry : meters.entrySet()) {
                     reportMetered(entry.getKey(), entry.getValue(), timestamp);
-                    LOGGER.info("Writing meter...");
+                    LOGGER.info("Writing meter.");
                 }
             }
             if (!timers.isEmpty()) {
                 for (Map.Entry<String, Timer> entry : timers.entrySet()) {
                     reportTimer(entry.getKey(), entry.getValue(), timestamp);
-                    LOGGER.info("Writing timer...");
+                    LOGGER.info("Writing timer.");
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to report metrics ", e);
         }
     }
 
