@@ -3,19 +3,13 @@ package com.mycompany.myapp.config;
 import com.codahale.metrics.*;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.Socket;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.concurrent.TimeUnit;
-
 
 /**
  * A reporter which publishes metric values to a Spark Receiver.
@@ -30,16 +24,15 @@ public class SparkReporter extends ScheduledReporter {
     public static class Builder {
         private final MetricRegistry registry;
         private Clock clock;
-        private String prefix;
         private TimeUnit rateUnit;
         private TimeUnit durationUnit;
         private MetricFilter filter;
-        private String sparkCluster = "localhost:9999";
+        private String host;
+        private Integer port;
 
         private Builder(MetricRegistry registry) {
             this.registry = registry;
             this.clock = Clock.defaultClock();
-            this.prefix = null;
             this.rateUnit = TimeUnit.SECONDS;
             this.durationUnit = TimeUnit.MILLISECONDS;
             this.filter = MetricFilter.ALL;
@@ -47,11 +40,6 @@ public class SparkReporter extends ScheduledReporter {
 
         public Builder withClock(Clock clock) {
             this.clock = clock;
-            return this;
-        }
-
-        public Builder prefixedWith(String prefix) {
-            this.prefix = prefix;
             return this;
         }
 
@@ -70,16 +58,17 @@ public class SparkReporter extends ScheduledReporter {
             return this;
         }
 
-        public Builder sparkCluster(String sparkCluster) {
-            this.sparkCluster = sparkCluster;
+        public Builder send(String socket) {
+            this.host = socket.split(":")[0];
+            this.port = Integer.parseInt(socket.split(":")[1]);
             return this;
         }
 
-        public SparkReporter build() {
+        public SparkReporter build() throws IOException {
             return new SparkReporter(registry,
-                sparkCluster,
+                host,
+                port,
                 clock,
-                prefix,
                 rateUnit,
                 durationUnit,
                 filter);
@@ -88,19 +77,24 @@ public class SparkReporter extends ScheduledReporter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SparkReporter.class);
 
-    private final String sparkCluster;
+    private final String host;
+    private final Integer port;
     private final Clock clock;
-    private final String prefix;
-    private final ObjectMapper mapper = new ObjectMapper();
-    private final ObjectWriter writer;
+    private Socket socket = null;
 
-    private SparkReporter(MetricRegistry registry, String sparkCluster, Clock clock, String prefix,
+    private SparkReporter(MetricRegistry registry, String host, Integer port, Clock clock,
                           TimeUnit rateUnit, TimeUnit durationUnit, MetricFilter filter) {
         super(registry, "spark-reporter", filter, rateUnit, durationUnit);
-        this.sparkCluster = sparkCluster;
+        this.host = host;
+        this.port = port;
         this.clock = clock;
-        this.prefix = prefix;
-        writer = mapper.writer();
+
+        try {
+            socket = new Socket(host, port);
+            LOGGER.info("connection socket : ", socket.toString());
+        } catch (IOException e) {
+            LOGGER.error("Fail connection socket : ", e);
+        }
     }
 
     @Override
@@ -115,43 +109,51 @@ public class SparkReporter extends ScheduledReporter {
             LOGGER.info("Waiting for metrics...");
             return;
         }
+
         final Long timestamp = clock.getTime() / 1000;
 
         try {
-            HttpURLConnection connection = openConnection();
-
-            JsonGenerator json = new JsonFactory().createGenerator(connection.getOutputStream());
-            json.writeStartObject();
-
-            for (Map.Entry<String, Gauge> entry : gauges.entrySet()) {
-                reportGauge(json, entry.getKey(), entry.getValue(), timestamp);
+            if (!gauges.isEmpty()) {
+                for (Map.Entry<String, Gauge> entry : gauges.entrySet()) {
+                    reportGauge(entry.getKey(), entry.getValue(), timestamp);
+                    LOGGER.info("Writing gauge...");
+                }
             }
-            for (Map.Entry<String, Counter> entry : counters.entrySet()) {
-                reportCounter(json, entry.getKey(), entry.getValue(), timestamp);
+            if (!counters.isEmpty()) {
+                for (Map.Entry<String, Counter> entry : counters.entrySet()) {
+                    reportCounter(entry.getKey(), entry.getValue(), timestamp);
+                    LOGGER.info("Writing counter...");
+                }
             }
-            for (Map.Entry<String, Histogram> entry : histograms.entrySet()) {
-                reportHistogram(json, entry.getKey(), entry.getValue(), timestamp);
+            if (!histograms.isEmpty()) {
+                for (Map.Entry<String, Histogram> entry : histograms.entrySet()) {
+                    reportHistogram(entry.getKey(), entry.getValue(), timestamp);
+                    LOGGER.info("Writing histogram...");
+                }
             }
-            for (Map.Entry<String, Meter> entry : meters.entrySet()) {
-                reportMetered(json, entry.getKey(), entry.getValue(), timestamp);
+            if (!meters.isEmpty()) {
+                for (Map.Entry<String, Meter> entry : meters.entrySet()) {
+                    reportMetered(entry.getKey(), entry.getValue(), timestamp);
+                    LOGGER.info("Writing meter...");
+                }
             }
-            for (Map.Entry<String, Timer> entry : timers.entrySet()) {
-                reportTimer(json, entry.getKey(), entry.getValue(), timestamp);
+            if (!timers.isEmpty()) {
+                for (Map.Entry<String, Timer> entry : timers.entrySet()) {
+                    reportTimer(entry.getKey(), entry.getValue(), timestamp);
+                    LOGGER.info("Writing timer...");
+                }
             }
-            json.writeEndObject();
-            LOGGER.info("flush de : ", json.toString());
-            json.flush();
-
-            closeConnection(connection);
         } catch (IOException e) {
-            LOGGER.error("Error report to Spark", e);
+            e.printStackTrace();
         }
     }
 
-    private void reportTimer(JsonGenerator json, String name, Timer timer, Long timestamp) throws IOException {
+    private void reportTimer(String name, Timer timer, Long timestamp) throws IOException {
+
+        JsonGenerator json = new JsonFactory().createGenerator(socket.getOutputStream());
         json.writeStartObject();
+        json.writeStringField("metric", "timer");
         json.writeStringField("name", name);
-        json.writeStringField("type", "timer");
         json.writeNumberField("timestamp", timestamp);
 
         final Snapshot snapshot = timer.getSnapshot();
@@ -171,12 +173,15 @@ public class SparkReporter extends ScheduledReporter {
         json.writeNumberField("p999", snapshot.get999thPercentile());
         json.writeNumberField("stddev", snapshot.getStdDev());
         json.writeEndObject();
+        json.flush();
     }
 
-    private void reportMetered(JsonGenerator json, String name, Metered meter, Long timestamp) throws IOException {
+    private void reportMetered(String name, Metered meter, Long timestamp) throws IOException {
+
+        JsonGenerator json = new JsonFactory().createGenerator(socket.getOutputStream());
         json.writeStartObject();
+        json.writeStringField("metric", "meter");
         json.writeStringField("name", name);
-        json.writeStringField("type", "meter");
         json.writeNumberField("timestamp", timestamp);
         json.writeNumberField("count", meter.getCount());
         json.writeNumberField("m1_rate", meter.getOneMinuteRate());
@@ -184,12 +189,15 @@ public class SparkReporter extends ScheduledReporter {
         json.writeNumberField("m15_rate", meter.getFifteenMinuteRate());
         json.writeNumberField("mean_rate", meter.getMeanRate());
         json.writeEndObject();
+        json.flush();
     }
 
-    private void reportHistogram(JsonGenerator json, String name, Histogram histogram, Long timestamp) throws IOException {
+    private void reportHistogram(String name, Histogram histogram, Long timestamp) throws IOException {
+
+        JsonGenerator json = new JsonFactory().createGenerator(socket.getOutputStream());
         json.writeStartObject();
+        json.writeStringField("metric", "histogram");
         json.writeStringField("name", name);
-        json.writeStringField("type", "histogram");
         json.writeNumberField("timestamp", timestamp);
 
         final Snapshot snapshot = histogram.getSnapshot();
@@ -205,43 +213,30 @@ public class SparkReporter extends ScheduledReporter {
         json.writeNumberField("p999", snapshot.get999thPercentile());
         json.writeNumberField("stddev", snapshot.getStdDev());
         json.writeEndObject();
+        json.flush();
     }
 
-    private void reportCounter(JsonGenerator json, String name, Counter counter, Long timestamp) throws IOException {
+    private void reportCounter(String name, Counter counter, Long timestamp) throws IOException {
+
+        JsonGenerator json = new JsonFactory().createGenerator(socket.getOutputStream());
         json.writeStartObject();
+        json.writeStringField("metric", "counter");
         json.writeStringField("name", name);
-        json.writeStringField("type", "counter");
         json.writeNumberField("timestamp", timestamp);
-        json.writeNumberField("counter", counter.getCount());
+        json.writeObjectField("counter", counter.getCount());
         json.writeEndObject();
+        json.flush();
     }
 
-    private void reportGauge(JsonGenerator json, String name, Gauge gauge, Long timestamp) throws IOException {
+    private void reportGauge(String name, Gauge gauge, Long timestamp) throws IOException {
+
+        JsonGenerator json = new JsonFactory().createGenerator(socket.getOutputStream());
         json.writeStartObject();
+        json.writeStringField("metric", "gauge");
         json.writeStringField("name", name);
-        json.writeStringField("type", "gauge");
         json.writeNumberField("timestamp", timestamp);
         json.writeObjectField("value", gauge.getValue());
         json.writeEndObject();
-    }
-
-    private HttpURLConnection openConnection() {
-        try {
-            HttpURLConnection connection = (HttpURLConnection) new URL(sparkCluster).openConnection();
-            connection.connect();
-            return connection;
-
-        } catch (MalformedURLException e) {
-            LOGGER.error("Error not valid url {}: {}", sparkCluster, e);
-        } catch (IOException e) {
-            LOGGER.error("Error connecting to {}: {}", sparkCluster, e);
-        }
-        return null;
-    }
-
-    private void closeConnection(HttpURLConnection connection) throws IOException {
-        connection.getOutputStream().close();
-        connection.disconnect();
+        json.flush();
     }
 }
-
