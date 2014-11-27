@@ -1,7 +1,6 @@
 package com.mycompany.myapp.config;
 
-import com.codahale.metrics.JmxReporter;
-import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.*;
 import com.codahale.metrics.graphite.Graphite;
 import com.codahale.metrics.graphite.GraphiteReporter;
 import com.codahale.metrics.health.HealthCheckRegistry;
@@ -19,9 +18,11 @@ import org.springframework.core.env.Environment;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.InetSocketAddress;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
@@ -30,8 +31,10 @@ public class MetricsConfiguration extends MetricsConfigurerAdapter implements En
 
     private static final String ENV_METRICS = "metrics.";
     private static final String ENV_METRICS_GRAPHITE = "metrics.graphite.";
+    private static final String ENV_METRICS_SPARK = "metrics.spark.";
     private static final String PROP_JMX_ENABLED = "jmx.enabled";
     private static final String PROP_GRAPHITE_ENABLED = "enabled";
+    private static final String PROP_SPARK_ENABLED = "enabled";
     private static final String PROP_GRAPHITE_PREFIX = "";
 
     private static final String PROP_PORT = "port";
@@ -80,14 +83,6 @@ public class MetricsConfiguration extends MetricsConfigurerAdapter implements En
             final JmxReporter jmxReporter = JmxReporter.forRegistry(METRIC_REGISTRY).build();
             jmxReporter.start();
         }
-
-        final SparkReporter reporter;
-        try {
-            reporter = SparkReporter.forRegistry(METRIC_REGISTRY).send("localhost:9999").build();
-            reporter.start(5, TimeUnit.SECONDS);
-        } catch (IOException e) {
-            log.error("Fail to initialize SparkReporter ", e);
-        }
     }
 
     @Configuration
@@ -121,7 +116,47 @@ public class MetricsConfiguration extends MetricsConfigurerAdapter implements En
                         .convertDurationsTo(TimeUnit.MILLISECONDS)
                         .prefixedWith(graphitePrefix)
                         .build(graphite);
-                graphiteReporter.start(1, TimeUnit.MINUTES);
+                graphiteReporter.start(1, TimeUnit.SECONDS);
+            }
+        }
+    }
+
+    @Configuration
+    @ConditionalOnClass(SparkReporter.class)
+    public static class SparkRegistry implements EnvironmentAware {
+
+        private final Logger log = LoggerFactory.getLogger(SparkRegistry.class);
+
+        @Inject
+        private MetricRegistry metricRegistry;
+
+        private RelaxedPropertyResolver propertyResolver;
+
+        @Override
+        public void setEnvironment(Environment environment) {
+            this.propertyResolver = new RelaxedPropertyResolver(environment, ENV_METRICS_SPARK);
+        }
+
+        @PostConstruct
+        private void init() {
+            Boolean sparkEnabled = propertyResolver.getProperty(PROP_SPARK_ENABLED, Boolean.class, false);
+            if (sparkEnabled) {
+                log.info("Initializing Metrics Spark reporting");
+                String sparkHost = propertyResolver.getRequiredProperty(PROP_HOST);
+                Integer sparkPort = propertyResolver.getRequiredProperty(PROP_PORT, Integer.class);
+
+                SparkReporter sparkReporter = null;
+
+                try {
+                    InetSocketAddress address = new InetSocketAddress(sparkHost, sparkPort);
+                    sparkReporter = SparkReporter.forRegistry(metricRegistry)
+                        .convertRatesTo(TimeUnit.SECONDS)
+                        .convertDurationsTo(TimeUnit.MILLISECONDS)
+                        .build(address);
+                } catch (IOException e) {
+                    log.error("Fail to initialize SparkReporter ", e);
+                }
+                sparkReporter.start(5, TimeUnit.SECONDS);
             }
         }
     }
