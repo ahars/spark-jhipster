@@ -1,12 +1,13 @@
 package com.mycompany.myapp.config.measures;
 
 import com.codahale.metrics.Histogram;
+import org.joda.time.DateTime;
 
 public class HistogramMeasure extends SnapshotMeasure {
 
     private Long count;
 
-    public HistogramMeasure(String name, Long timestamp, Histogram histogram) {
+    public HistogramMeasure(String name, DateTime timestamp, Histogram histogram) {
         super(name, "histogram", timestamp, histogram.getSnapshot());
         this.count = histogram.getCount();
     }

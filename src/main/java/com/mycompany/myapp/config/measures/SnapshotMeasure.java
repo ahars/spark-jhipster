@@ -1,6 +1,7 @@
 package com.mycompany.myapp.config.measures;
 
 import com.codahale.metrics.Snapshot;
+import org.joda.time.DateTime;
 
 public class SnapshotMeasure extends Measure {
 
@@ -15,7 +16,7 @@ public class SnapshotMeasure extends Measure {
     private Double p999;
     private Double stdDev;
 
-    public SnapshotMeasure(String name, String type, Long timestamp, Snapshot snapshot) {
+    public SnapshotMeasure(String name, String type, DateTime timestamp, Snapshot snapshot) {
         super(name, type, timestamp);
         this.max = snapshot.getMax();
         this.min = snapshot.getMin();

@@ -116,7 +116,7 @@ public class MetricsConfiguration extends MetricsConfigurerAdapter implements En
                         .convertDurationsTo(TimeUnit.MILLISECONDS)
                         .prefixedWith(graphitePrefix)
                         .build(graphite);
-                graphiteReporter.start(1, TimeUnit.SECONDS);
+                graphiteReporter.start(1, TimeUnit.MINUTES);
             }
         }
     }
@@ -145,18 +145,16 @@ public class MetricsConfiguration extends MetricsConfigurerAdapter implements En
                 String sparkHost = propertyResolver.getRequiredProperty(PROP_HOST);
                 Integer sparkPort = propertyResolver.getRequiredProperty(PROP_PORT, Integer.class);
 
-                SparkReporter sparkReporter = null;
-
                 try {
                     InetSocketAddress address = new InetSocketAddress(sparkHost, sparkPort);
-                    sparkReporter = SparkReporter.forRegistry(metricRegistry)
+                    SparkReporter sparkReporter = SparkReporter.forRegistry(metricRegistry)
                         .convertRatesTo(TimeUnit.SECONDS)
                         .convertDurationsTo(TimeUnit.MILLISECONDS)
                         .build(address);
+                    sparkReporter.start(10, TimeUnit.SECONDS);
                 } catch (IOException e) {
                     log.error("Fail to initialize SparkReporter ", e);
                 }
-                sparkReporter.start(5, TimeUnit.SECONDS);
             }
         }
     }

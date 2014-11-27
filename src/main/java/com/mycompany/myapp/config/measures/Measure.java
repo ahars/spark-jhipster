@@ -1,16 +1,18 @@
 package com.mycompany.myapp.config.measures;
 
+import org.joda.time.DateTime;
+
 import java.io.Serializable;
 
 public class Measure implements Serializable {
 
     private String name;
-    private String type;
-    private Long timestamp;
+    private String metric;
+    private DateTime timestamp;
 
-    public Measure(String name, String type, Long timestamp) {
+    public Measure(String name, String metric, DateTime timestamp) {
         this.name = name;
-        this.type = type;
+        this.metric = metric;
         this.timestamp = timestamp;
     }
 
@@ -22,19 +24,19 @@ public class Measure implements Serializable {
         this.name = name;
     }
 
-    public String getType() {
-        return type;
+    public String getMetric() {
+        return metric;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setMetric(String metric) {
+        this.metric = metric;
     }
 
-    public Long getTimestamp() {
+    public DateTime getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Long timestamp) {
+    public void setTimestamp(DateTime timestamp) {
         this.timestamp = timestamp;
     }
 
@@ -42,7 +44,7 @@ public class Measure implements Serializable {
     public String toString() {
         return "Measure{" +
             "name='" + name + '\'' +
-            ", type='" + type + '\'' +
+            ", metric='" + metric + '\'' +
             ", timestamp=" + timestamp +
             '}';
     }
