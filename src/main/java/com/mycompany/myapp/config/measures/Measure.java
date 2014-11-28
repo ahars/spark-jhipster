@@ -8,9 +8,9 @@ public class Measure implements Serializable {
 
     private String name;
     private String metric;
-    private DateTime timestamp;
+    private String timestamp;
 
-    public Measure(String name, String metric, DateTime timestamp) {
+    public Measure(String name, String metric, String timestamp) {
         this.name = name;
         this.metric = metric;
         this.timestamp = timestamp;
@@ -32,11 +32,11 @@ public class Measure implements Serializable {
         this.metric = metric;
     }
 
-    public DateTime getTimestamp() {
+    public String getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(DateTime timestamp) {
+    public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
     }
 

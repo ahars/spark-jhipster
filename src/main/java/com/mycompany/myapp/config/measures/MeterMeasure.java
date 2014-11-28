@@ -1,7 +1,6 @@
 package com.mycompany.myapp.config.measures;
 
 import com.codahale.metrics.Metered;
-import org.joda.time.DateTime;
 
 public class MeterMeasure extends Measure {
 
@@ -11,7 +10,7 @@ public class MeterMeasure extends Measure {
     private Double m15Rate;
     private Double meanRate;
 
-    public MeterMeasure(String name, DateTime timestamp, Metered meter) {
+    public MeterMeasure(String name, String timestamp, Metered meter) {
         super(name, "meter", timestamp);
         this.count = meter.getCount();
         this.m1Rate = meter.getOneMinuteRate();

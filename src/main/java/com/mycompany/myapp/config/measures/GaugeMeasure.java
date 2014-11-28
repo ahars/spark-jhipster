@@ -1,13 +1,12 @@
 package com.mycompany.myapp.config.measures;
 
 import com.codahale.metrics.Gauge;
-import org.joda.time.DateTime;
 
 public class GaugeMeasure extends Measure {
 
     private Object value;
 
-    public GaugeMeasure(String name, DateTime timestamp, Gauge gauge) {
+    public GaugeMeasure(String name, String timestamp, Gauge gauge) {
         super(name, "gauge", timestamp);
         this.value = gauge.getValue();
     }

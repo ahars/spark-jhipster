@@ -1,7 +1,6 @@
 package com.mycompany.myapp.config.measures;
 
 import com.codahale.metrics.Timer;
-import org.joda.time.DateTime;
 
 public class TimerMeasure extends SnapshotMeasure {
 
@@ -11,7 +10,7 @@ public class TimerMeasure extends SnapshotMeasure {
     private Double m15Rate;
     private Double meanRate;
 
-    public TimerMeasure(String name, DateTime timestamp, Timer timer) {
+    public TimerMeasure(String name, String timestamp, Timer timer) {
         super(name, "timer", timestamp, timer.getSnapshot());
         this.count = timer.getCount();
         this.m1Rate = timer.getOneMinuteRate();
