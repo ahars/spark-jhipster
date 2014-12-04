@@ -10,8 +10,8 @@ public class MeterMeasure extends Measure {
     private Double m15Rate;
     private Double meanRate;
 
-    public MeterMeasure(String name, String timestamp, Metered meter) {
-        super(name, "meter", timestamp);
+    public MeterMeasure(String name, Metered meter) {
+        super(name, "meter");
         this.count = meter.getCount();
         this.m1Rate = meter.getOneMinuteRate();
         this.m5Rate = meter.getFiveMinuteRate();
@@ -23,50 +23,19 @@ public class MeterMeasure extends Measure {
         return count;
     }
 
-    public void setCount(Long count) {
-        this.count = count;
-    }
-
     public Double getM1Rate() {
         return m1Rate;
-    }
-
-    public void setM1Rate(Double m1Rate) {
-        this.m1Rate = m1Rate;
     }
 
     public Double getM5Rate() {
         return m5Rate;
     }
 
-    public void setM5Rate(Double m5Rate) {
-        this.m5Rate = m5Rate;
-    }
-
     public Double getM15Rate() {
         return m15Rate;
     }
 
-    public void setM15Rate(Double m15Rate) {
-        this.m15Rate = m15Rate;
-    }
-
     public Double getMeanRate() {
         return meanRate;
-    }
-
-    public void setMeanRate(Double meanRate) {
-        this.meanRate = meanRate;
-    }
-
-    @Override
-    public String toString() {
-        return "Meter{" +
-            "count=" + count +
-            ", m1Rate=" + m1Rate +
-            ", m5Rate=" + m5Rate +
-            ", m15Rate=" + m15Rate +
-            ", meanRate=" + meanRate +
-            '}';
     }
 }

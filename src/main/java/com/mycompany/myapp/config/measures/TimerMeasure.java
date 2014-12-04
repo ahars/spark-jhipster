@@ -10,8 +10,8 @@ public class TimerMeasure extends SnapshotMeasure {
     private Double m15Rate;
     private Double meanRate;
 
-    public TimerMeasure(String name, String timestamp, Timer timer) {
-        super(name, "timer", timestamp, timer.getSnapshot());
+    public TimerMeasure(String name, Timer timer) {
+        super(name, "timer", timer.getSnapshot());
         this.count = timer.getCount();
         this.m1Rate = timer.getOneMinuteRate();
         this.m5Rate = timer.getFiveMinuteRate();
@@ -23,50 +23,19 @@ public class TimerMeasure extends SnapshotMeasure {
         return count;
     }
 
-    public void setCount(Long count) {
-        this.count = count;
-    }
-
     public Double getM1Rate() {
         return m1Rate;
-    }
-
-    public void setM1Rate(Double m1Rate) {
-        this.m1Rate = m1Rate;
     }
 
     public Double getM5Rate() {
         return m5Rate;
     }
 
-    public void setM5Rate(Double m5Rate) {
-        this.m5Rate = m5Rate;
-    }
-
     public Double getM15Rate() {
         return m15Rate;
     }
 
-    public void setM15Rate(Double m15Rate) {
-        this.m15Rate = m15Rate;
-    }
-
     public Double getMeanRate() {
         return meanRate;
-    }
-
-    public void setMeanRate(Double meanRate) {
-        this.meanRate = meanRate;
-    }
-
-    @Override
-    public String toString() {
-        return "Timer{" +
-            "count=" + count +
-            ", m1Rate=" + m1Rate +
-            ", m5Rate=" + m5Rate +
-            ", m15Rate=" + m15Rate +
-            ", meanRate=" + meanRate +
-            '}';
     }
 }

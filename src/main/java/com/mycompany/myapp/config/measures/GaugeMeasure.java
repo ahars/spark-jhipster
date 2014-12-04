@@ -6,23 +6,12 @@ public class GaugeMeasure extends Measure {
 
     private Object value;
 
-    public GaugeMeasure(String name, String timestamp, Gauge gauge) {
-        super(name, "gauge", timestamp);
+    public GaugeMeasure(String name, Gauge gauge) {
+        super(name, "gauge");
         this.value = gauge.getValue();
     }
 
     public Object getValue() {
         return value;
-    }
-
-    public void setValue(Object value) {
-        this.value = value;
-    }
-
-    @Override
-    public String toString() {
-        return "GaugeMeasure{" +
-            "value=" + value +
-            '}';
     }
 }

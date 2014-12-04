@@ -77,8 +77,6 @@ public class SparkReporter extends ScheduledReporter {
                        SortedMap<String, Histogram> histograms,
                        SortedMap<String, Meter> meters,
                        SortedMap<String, Timer> timers) {
-        String timestamp = DateTime.now().toString();
-
         try {
 
             // nothing to do if we don't have any metrics to report
@@ -89,31 +87,31 @@ public class SparkReporter extends ScheduledReporter {
 
             if (!gauges.isEmpty()) {
                 for (Map.Entry<String, Gauge> entry : gauges.entrySet()) {
-                    reportGauge(entry.getKey(), entry.getValue(), timestamp);
+                    reportGauge(entry.getKey(), entry.getValue());
                 }
             }
 
             if (!counters.isEmpty()) {
                 for (Map.Entry<String, Counter> entry : counters.entrySet()) {
-                    reportCounter(entry.getKey(), entry.getValue(), timestamp);
+                    reportCounter(entry.getKey(), entry.getValue());
                 }
             }
 
             if (!histograms.isEmpty()) {
                 for (Map.Entry<String, Histogram> entry : histograms.entrySet()) {
-                    reportHistogram(entry.getKey(), entry.getValue(), timestamp);
+                    reportHistogram(entry.getKey(), entry.getValue());
                 }
             }
 
             if (!meters.isEmpty()) {
                 for (Map.Entry<String, Meter> entry : meters.entrySet()) {
-                    reportMetered(entry.getKey(), entry.getValue(), timestamp);
+                    reportMetered(entry.getKey(), entry.getValue());
                 }
             }
 
             if (!timers.isEmpty()) {
                 for (Map.Entry<String, Timer> entry : timers.entrySet()) {
-                    reportTimer(entry.getKey(), entry.getValue(), timestamp);
+                    reportTimer(entry.getKey(), entry.getValue());
                 }
             }
         } catch (IOException var18) {
@@ -121,30 +119,30 @@ public class SparkReporter extends ScheduledReporter {
         }
     }
 
-    private void reportGauge(String name, Gauge gauge, String timestamp) throws IOException {
+    private void reportGauge(String name, Gauge gauge) throws IOException {
         if (this.isANumber(gauge.getValue()) == true) {
-            this.json = mapper.writeValueAsString(new GaugeMeasure(name, timestamp, gauge));
+            this.json = mapper.writeValueAsString(new GaugeMeasure(name, gauge));
             this.writer.println(json);
         }
     }
 
-    private void reportCounter(String name, Counter counter, String timestamp) throws IOException {
-        this.json  = mapper.writeValueAsString(new CounterMeasure(name, timestamp, counter));
+    private void reportCounter(String name, Counter counter) throws IOException {
+        this.json  = mapper.writeValueAsString(new CounterMeasure(name, counter));
         this.writer.println(json);
     }
 
-    private void reportHistogram(String name, Histogram histogram, String timestamp) throws IOException {
-        this.json  = mapper.writeValueAsString(new HistogramMeasure(name, timestamp, histogram));
+    private void reportHistogram(String name, Histogram histogram) throws IOException {
+        this.json  = mapper.writeValueAsString(new HistogramMeasure(name, histogram));
         this.writer.println(json);
     }
 
-    private void reportMetered(String name, Metered meter, String timestamp) throws IOException {
-        this.json  = mapper.writeValueAsString(new MeterMeasure(name, timestamp, meter));
+    private void reportMetered(String name, Metered meter) throws IOException {
+        this.json  = mapper.writeValueAsString(new MeterMeasure(name, meter));
         this.writer.println(json);
     }
 
-    private void reportTimer(String name, Timer timer, String timestamp) throws IOException {
-        this.json  = mapper.writeValueAsString(new TimerMeasure(name, timestamp, timer));
+    private void reportTimer(String name, Timer timer) throws IOException {
+        this.json  = mapper.writeValueAsString(new TimerMeasure(name, timer));
         this.writer.println(json);
     }
 

@@ -6,23 +6,12 @@ public class HistogramMeasure extends SnapshotMeasure {
 
     private Long count;
 
-    public HistogramMeasure(String name, String timestamp, Histogram histogram) {
-        super(name, "histogram", timestamp, histogram.getSnapshot());
+    public HistogramMeasure(String name, Histogram histogram) {
+        super(name, "histogram", histogram.getSnapshot());
         this.count = histogram.getCount();
     }
 
     public Long getCount() {
         return count;
-    }
-
-    public void setCount(Long count) {
-        this.count = count;
-    }
-
-    @Override
-    public String toString() {
-        return "HistogramMeasure{" +
-            "count=" + count +
-            '}';
     }
 }
