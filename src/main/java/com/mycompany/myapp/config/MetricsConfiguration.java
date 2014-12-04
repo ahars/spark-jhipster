@@ -145,16 +145,11 @@ public class MetricsConfiguration extends MetricsConfigurerAdapter implements En
                 String sparkHost = propertyResolver.getRequiredProperty(PROP_HOST);
                 Integer sparkPort = propertyResolver.getRequiredProperty(PROP_PORT, Integer.class);
 
-                try {
-                    InetSocketAddress address = new InetSocketAddress(sparkHost, sparkPort);
-                    SparkReporter sparkReporter = SparkReporter.forRegistry(metricRegistry)
-                        .convertRatesTo(TimeUnit.SECONDS)
-                        .convertDurationsTo(TimeUnit.MILLISECONDS)
-                        .build(address);
-                    sparkReporter.start(10, TimeUnit.SECONDS);
-                } catch (IOException e) {
-                    log.error("Fail to initialize SparkReporter ", e);
-                }
+                SparkReporter sparkReporter = SparkReporter.forRegistry(metricRegistry)
+                    .convertRatesTo(TimeUnit.SECONDS)
+                    .convertDurationsTo(TimeUnit.MILLISECONDS)
+                    .build(sparkHost, sparkPort);
+                sparkReporter.start(10, TimeUnit.SECONDS);
             }
         }
     }
