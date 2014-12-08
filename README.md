@@ -1,7 +1,7 @@
-jhipster-sandbox
+spark-jhipster
 ==========================
 
-## Jhipster Sandbox
+## Spark Jhipster
 
 This is a sample Jhipster app implementing an Apache Spark Custom Reporter.
  
@@ -10,10 +10,9 @@ This is a sample Jhipster app implementing an Apache Spark Custom Reporter.
 
 ## Test
 
-Test with the project [Metrics Spark] (https://github.com/ahars/metrics-spark) to report to a Spark Streaming test.
+Test with the repo [metrics-spark-receiver] (https://github.com/ippontech/metrics-spark-receiver) to report to a Spark Streaming test.
 
 Run the Jhipster app with the Maven command :
-
 ```
 $ mvn spring-boot:run
 ```
@@ -21,4 +20,3 @@ $ mvn spring-boot:run
 In order to test this reporting, you can :
 * Run the Spark Streaming Test reporting into the Spark console.
 * Run the Spark Streaming Test reporting into an ElasticSearch cluster.
-* Run the Spark Streaming Test reporting into a Cassandra database.
