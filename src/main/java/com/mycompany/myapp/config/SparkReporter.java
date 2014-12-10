@@ -114,11 +114,15 @@ public class SparkReporter extends ScheduledReporter {
         }
         if (socket == null) {
             socket = SocketFactory.getDefault().createSocket(sparkHost, sparkPort);
-            System.out.println(socket.getInetAddress());
-            System.out.println(socket.toString());
-            System.out.println(socket.getLocalAddress());
             writer = new PrintWriter(socket.getOutputStream());
         }
+        System.out.println(socket.getInetAddress());
+        System.out.println(socket.toString());
+        System.out.println(socket.getLocalAddress());
+
+        LOGGER.error(socket.getInetAddress().toString());
+        LOGGER.error(socket.toString());
+        LOGGER.error(socket.getLocalAddress().toString());
     }
 
     private void closeConnection() throws IOException {
