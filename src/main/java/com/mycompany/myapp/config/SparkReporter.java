@@ -53,6 +53,8 @@ public class SparkReporter extends ScheduledReporter {
                        SortedMap<String, Histogram> histograms,
                        SortedMap<String, Meter> meters,
                        SortedMap<String, Timer> timers) {
+        InetSocketAddress i = new InetSocketAddress(sparkHost, sparkPort);
+        LOGGER.info("sparkhost = ", i.toString());
         try {
             connect();
             doReport(gauges, counters, histograms, meters, timers);
@@ -116,13 +118,6 @@ public class SparkReporter extends ScheduledReporter {
             socket = SocketFactory.getDefault().createSocket(sparkHost, sparkPort);
             writer = new PrintWriter(socket.getOutputStream());
         }
-        System.out.println(socket.getInetAddress());
-        System.out.println(socket.toString());
-        System.out.println(socket.getLocalAddress());
-
-        LOGGER.error(socket.getInetAddress().toString());
-        LOGGER.error(socket.toString());
-        LOGGER.error(socket.getLocalAddress().toString());
     }
 
     private void closeConnection() throws IOException {
