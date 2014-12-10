@@ -114,6 +114,9 @@ public class SparkReporter extends ScheduledReporter {
         }
         if (socket == null) {
             socket = SocketFactory.getDefault().createSocket(sparkHost, sparkPort);
+            System.out.println(socket.getInetAddress());
+            System.out.println(socket.toString());
+            System.out.println(socket.getLocalAddress());
             writer = new PrintWriter(socket.getOutputStream());
         }
     }
