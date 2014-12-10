@@ -42,7 +42,7 @@ public class SparkReporter extends ScheduledReporter {
     private SparkReporter(MetricRegistry registry, String sparkHost, int sparkPort, TimeUnit rateUnit,
                           TimeUnit durationUnit, MetricFilter filter) {
         super(registry, "spark-reporter", filter, rateUnit, durationUnit);
-        this.sparkHost = sparkHost;
+        this.sparkHost = "spark";
         this.sparkPort = sparkPort;
         this.mapper = new ObjectMapper();
     }
