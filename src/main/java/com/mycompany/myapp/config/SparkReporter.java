@@ -54,7 +54,7 @@ public class SparkReporter extends ScheduledReporter {
                        SortedMap<String, Meter> meters,
                        SortedMap<String, Timer> timers) {
         InetSocketAddress i = new InetSocketAddress(sparkHost, sparkPort);
-        LOGGER.info("sparkhost = ", i.toString());
+        LOGGER.info("sparkhost = ", sparkHost, " : ", i.toString());
         try {
             connect();
             doReport(gauges, counters, histograms, meters, timers);
