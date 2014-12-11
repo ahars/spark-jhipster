@@ -39,7 +39,7 @@ metrics:
     jmx.enabled: true
     spark:
         enabled: true
-        host: spark
+        host: localhost
         port: 9999
     graphite:
         enabled: false

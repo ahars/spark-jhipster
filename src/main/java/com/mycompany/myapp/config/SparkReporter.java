@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import javax.net.SocketFactory;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Map;
@@ -42,7 +43,7 @@ public class SparkReporter extends ScheduledReporter {
     private SparkReporter(MetricRegistry registry, String sparkHost, int sparkPort, TimeUnit rateUnit,
                           TimeUnit durationUnit, MetricFilter filter) {
         super(registry, "spark-reporter", filter, rateUnit, durationUnit);
-        this.sparkHost = "spark";
+        this.sparkHost = sparkHost;
         this.sparkPort = sparkPort;
         this.mapper = new ObjectMapper();
     }
@@ -53,9 +54,6 @@ public class SparkReporter extends ScheduledReporter {
                        SortedMap<String, Histogram> histograms,
                        SortedMap<String, Meter> meters,
                        SortedMap<String, Timer> timers) {
-        InetSocketAddress i = new InetSocketAddress(sparkHost, sparkPort);
-        LOGGER.info("sparkhost = ", sparkHost);
-        LOGGER.info("address = ", i.toString());
         try {
             connect();
             doReport(gauges, counters, histograms, meters, timers);
@@ -117,7 +115,7 @@ public class SparkReporter extends ScheduledReporter {
         }
         if (socket == null) {
             socket = SocketFactory.getDefault().createSocket(sparkHost, sparkPort);
-            writer = new PrintWriter(socket.getOutputStream());
+            writer = new PrintWriter(socket.getOutputStream(), true);
         }
     }
 
