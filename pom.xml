@@ -314,6 +314,11 @@
             <artifactId>spring-cloud-localconfig-connector</artifactId>
             <version>${spring-cloud.version}</version>
         </dependency>
+        <dependency>
+            <groupId>fr.ippon</groupId>
+            <artifactId>metrics-spark-reporter</artifactId>
+            <version>1.0</version>
+        </dependency>
     </dependencies>
     <build>
         <resources>
