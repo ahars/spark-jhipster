@@ -4,14 +4,14 @@ server:
 spring:
     profiles:
         active: dev
-    
+
     datasource:
         dataSourceClassName: org.h2.jdbcx.JdbcDataSource
         url: jdbc:h2:mem:jhipster;DB_CLOSE_DELAY=-1
-        databaseName: 
-        serverName: 
-        username: 
-        password: 
+        databaseName:
+        serverName:
+        username:
+        password:
 
     jpa:
         database-platform: org.hibernate.dialect.H2Dialect
@@ -38,12 +38,12 @@ spring:
 metrics:
     jmx.enabled: true
     spark:
-        enabled: false
-        host: localhost
+        enabled: true
+        host: spark
         port: 9999
     graphite:
         enabled: false
-        host: localhost
+        host: spark
         port: 2003
         prefix: spark-jhipster
 
