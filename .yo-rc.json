@@ -1,6 +1,6 @@
 {
   "generator-jhipster": {
-    "baseName": "jhipster_sandbox",
+    "baseName": "spark-jhipster",
     "packageName": "com.mycompany.myapp",
     "packageFolder": "com/mycompany/myapp",
     "authenticationType": "cookie",

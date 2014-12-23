@@ -6,7 +6,7 @@ security.basic.enabled: false
 endpoints.jolokia.enabled: false
 
 # security configuration (this key should be unique for your application, and kept secret)
-jhipster.security.rememberme.key: jhipster_sandbox
+jhipster.security.rememberme.key: spark-jhipster
 
 async:
     corePoolSize: 2
@@ -22,14 +22,14 @@ spring:
         protocol: smtp
         tls: false
         auth: false
-        from: jhipster_sandbox@localhost
+        from: spark-jhipster@localhost
 
     messageSource:
         cacheSeconds: 1
 
 swagger:
-    title: jhipster_sandbox API
-    description: jhipster_sandbox applications and beyond!
+    title: spark-jhipster API
+    description: spark-jhipster applications and beyond!
     termsOfServiceUrl: http://jhipster.github.io/
     contact:
     license: Apache 2.0

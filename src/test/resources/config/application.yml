@@ -4,7 +4,7 @@ server:
 
 
 # security configuration (this key should be unique for your application, and kept secret)
-jhipster.security.rememberme.key: jhipster_sandbox
+jhipster.security.rememberme.key: spark-jhipster
 
 async:
     corePoolSize: 2
@@ -16,7 +16,7 @@ spring:
     
     datasource:
         dataSourceClassName: org.h2.jdbcx.JdbcDataSource
-        url: jdbc:h2:mem:jhipster_sandbox
+        url: jdbc:h2:mem:spark-jhipster;DB_CLOSE_DELAY=-1
         databaseName:
         serverName:
         username:

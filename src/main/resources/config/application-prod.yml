@@ -2,15 +2,16 @@ server:
     port: 8080
 
 spring:
-    profiles: prod
-
+    profiles:
+        active: prod
+    
     datasource:
         dataSourceClassName: com.mysql.jdbc.jdbc2.optional.MysqlDataSource
-        url: jdbc:mysql://localhost:3306/jhipster_sandbox
-        databaseName:
-        serverName:
+        url: jdbc:mysql://localhost:3306/spark-jhipster
+        databaseName: 
+        serverName: 
         username: root
-        password:
+        password: 
         cachePrepStmts: true
         prepStmtCacheSize: 250
         prepStmtCacheSqlLimit: 2048
@@ -30,7 +31,7 @@ spring:
             hibernate.cache.use_query_cache: false
             hibernate.generate_statistics: false
             hibernate.cache.region.factory_class: org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory
-
+            
 
     mail:
         baseUrl: http://localhost:8080
@@ -38,20 +39,18 @@ spring:
     thymeleaf:
         mode: XHTML
         cache: true
-        viewNames: error
-
 
 metrics:
     jmx.enabled: true
     spark:
-        enabled: true
-        host: spark
+        enabled: false
+        host: localhost
         port: 9999
     graphite:
         enabled: false
         host: localhost
         port: 2003
-        prefix: jhipster_sandbox
+        prefix: spark-jhipster
 
 cache:
     timeToLiveSeconds: 3600

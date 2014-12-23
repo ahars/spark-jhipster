@@ -1,13 +1,14 @@
 package com.mycompany.myapp.config;
 
-import com.codahale.metrics.*;
+import com.codahale.metrics.JmxReporter;
+import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.graphite.Graphite;
 import com.codahale.metrics.graphite.GraphiteReporter;
 import com.codahale.metrics.health.HealthCheckRegistry;
 import com.codahale.metrics.jvm.*;
 import com.ryantenney.metrics.spring.config.annotation.EnableMetrics;
 import com.ryantenney.metrics.spring.config.annotation.MetricsConfigurerAdapter;
-import fr.ippon.SparkReporter;
+import fr.ippon.spark.metrics.SparkReporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -15,19 +16,18 @@ import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import java.io.File;
-import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.InetSocketAddress;
-import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
 @EnableMetrics(proxyTargetClass = true)
+@Profile("!" + Constants.SPRING_PROFILE_FAST)
 public class MetricsConfiguration extends MetricsConfigurerAdapter implements EnvironmentAware {
 
     private static final String ENV_METRICS = "metrics.";
@@ -81,13 +81,14 @@ public class MetricsConfiguration extends MetricsConfigurerAdapter implements En
         METRIC_REGISTRY.register(PROP_METRIC_REG_JVM_BUFFERS, new BufferPoolMetricSet(ManagementFactory.getPlatformMBeanServer()));
         if (propertyResolver.getProperty(PROP_JMX_ENABLED, Boolean.class, false)) {
             log.info("Initializing Metrics JMX reporting");
-            final JmxReporter jmxReporter = JmxReporter.forRegistry(METRIC_REGISTRY).build();
+            JmxReporter jmxReporter = JmxReporter.forRegistry(METRIC_REGISTRY).build();
             jmxReporter.start();
         }
     }
 
     @Configuration
     @ConditionalOnClass(Graphite.class)
+    @Profile("!" + Constants.SPRING_PROFILE_FAST)
     public static class GraphiteRegistry implements EnvironmentAware {
 
         private final Logger log = LoggerFactory.getLogger(GraphiteRegistry.class);
@@ -124,6 +125,7 @@ public class MetricsConfiguration extends MetricsConfigurerAdapter implements En
 
     @Configuration
     @ConditionalOnClass(SparkReporter.class)
+    @Profile("!" + Constants.SPRING_PROFILE_FAST)
     public static class SparkRegistry implements EnvironmentAware {
 
         private final Logger log = LoggerFactory.getLogger(SparkRegistry.class);
@@ -145,12 +147,11 @@ public class MetricsConfiguration extends MetricsConfigurerAdapter implements En
                 log.info("Initializing Metrics Spark reporting");
                 String sparkHost = propertyResolver.getRequiredProperty(PROP_HOST);
                 Integer sparkPort = propertyResolver.getRequiredProperty(PROP_PORT, Integer.class);
-
                 SparkReporter sparkReporter = SparkReporter.forRegistry(metricRegistry)
-                    .convertRatesTo(TimeUnit.SECONDS)
-                    .convertDurationsTo(TimeUnit.MILLISECONDS)
-                    .build(sparkHost, sparkPort);
-                sparkReporter.start(10, TimeUnit.SECONDS);
+                        .convertRatesTo(TimeUnit.SECONDS)
+                        .convertDurationsTo(TimeUnit.MILLISECONDS)
+                        .build(sparkHost, sparkPort);
+                sparkReporter.start(1, TimeUnit.MINUTES);
             }
         }
     }

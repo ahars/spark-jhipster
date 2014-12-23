@@ -2,15 +2,16 @@ server:
     port: 8080
 
 spring:
-    profiles: dev
-
+    profiles:
+        active: dev
+    
     datasource:
         dataSourceClassName: org.h2.jdbcx.JdbcDataSource
-        url: jdbc:h2:mem:jhipster
-        databaseName:
-        serverName:
-        username:
-        password:
+        url: jdbc:h2:mem:jhipster;DB_CLOSE_DELAY=-1
+        databaseName: 
+        serverName: 
+        username: 
+        password: 
 
     jpa:
         database-platform: org.hibernate.dialect.H2Dialect
@@ -33,19 +34,18 @@ spring:
     thymeleaf:
         mode: XHTML
         cache: false
-        viewNames: error
 
 metrics:
     jmx.enabled: true
     spark:
-        enabled: true
-        host: spark
+        enabled: false
+        host: localhost
         port: 9999
     graphite:
         enabled: false
         host: localhost
         port: 2003
-        prefix: jhipster_sandbox
+        prefix: spark-jhipster
 
 cache:
     timeToLiveSeconds: 3600
